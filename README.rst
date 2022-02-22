@@ -35,5 +35,5 @@ License
 -------
 MIT license.
 
-DIA (Debug Information Access) is distrbuted according to the Microsoft Visual Studio™ distributable
+DIA (Debug Information Access) is distributed according to the Microsoft Visual Studio™ distributable
 code license terms: https://visualstudio.microsoft.com/license-terms/mlt031819/
