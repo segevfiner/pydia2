@@ -1,5 +1,5 @@
 """
-DIA packaged for use without registration using comtypes.
+DIA packaged for use without COM registration using comtypes.
 """
 
 import sys
