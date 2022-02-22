@@ -8,6 +8,7 @@ Welcome to pydia2's documentation!
 
 .. automodule:: pydia2
    :members:
+   :member-order: bysource
 
 
 Indices and tables
