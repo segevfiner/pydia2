@@ -49,7 +49,23 @@ def print_public_symbol(symbol):
     except comtypes.COMError:
         rva = 0xFFFFFFFF
 
-    print(f"{symbol.symTag}: [{rva:08X}][{symbol.addressSection:04X}:{symbol.addressOffset:08X}]")
+    print(f"{pydia2.SymTag(symbol.symTag).name}: [{rva:08X}][{symbol.addressSection:04X}:{symbol.addressOffset:08X}] ", end='')
+
+    if symbol.symTag == pydia2.dia.SymTagThunk:
+        try:
+            print("f{symbol.name}")
+        except comtypes.COMError:
+            try:
+                target_rva = symbol.targetRelativeVirtualAdddress
+            except comtypes.COMError:
+                target_rva = 0xFFFFFFFF
+
+            print(f"target -> [{target_rva:08X}][{symbol.targetSection:04X}:{symbol.targetOffset:08X}]")
+    else:
+        try:
+            print(f"{symbol.name}({symbol.undecoratedName})")
+        except comtypes.COMError:
+            print(f"{symbol.name}")
 
 
 def dump_all_publics(session):
