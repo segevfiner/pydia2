@@ -71,6 +71,8 @@ setup(
             include_dirs=[os.path.join(dia_sdk, "include")],
             library_dirs=[os.path.join(dia_sdk, "lib", arch_dir)],
             libraries=["Advapi32", "diaguids"],
+            define_macros=[("Py_LIMITED_API", "0x03070000")],
+            py_limited_api=True,
         ),
     ],
     package_data={
