@@ -48,6 +48,10 @@ setup(
     long_description=long_description,
     long_description_content_type="text/x-rst",
     url="https://github.com/segevfiner/pydia2",
+    project_urls={
+        "Documentation": "https://segevfiner.github.io/pydia2/",
+        "Issue Tracker": "https://github.com/segevfiner/pydia2/issues",
+    },
     license="MIT",
     classifiers=[
         "Development Status :: 3 - Alpha",
