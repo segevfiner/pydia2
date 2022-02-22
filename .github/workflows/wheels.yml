@@ -1,0 +1,58 @@
+name: Wheels
+
+on:
+  push:
+    branches:
+    - master
+  release:
+    types:
+    - published
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-2019]
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      # Used to host cibuildwheel
+      - uses: actions/setup-python@v2
+
+      - name: Build sdist
+        if: matrix.os == 'windows-2019'
+        run: |
+          python setup.py sdist
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.3.1
+        with:
+          output-dir: dist
+        env:
+          CIBW_BUILD: "cp310-win32 cp310-win_amd64"
+
+      - uses: actions/upload-artifact@v2
+        with:
+          path: dist/*
+
+  upload_release:
+    name: Upload release
+    needs: [build_wheels]
+    runs-on: windows-2019
+    if: github.event_name == 'release' && github.event.action == 'published'
+
+    steps:
+    - uses: actions/download-artifact@v2
+      with:
+        name: artifact
+        path: dist
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: dist/*
