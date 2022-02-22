@@ -5,6 +5,7 @@ DIA packaged for use without COM registration using comtypes.
 import sys
 import pathlib
 import ctypes
+import enum
 import comtypes
 from comtypes import client
 from . import _dia, cvconst
@@ -54,3 +55,51 @@ def CreateObject(progid, interface=None):
     iid = interface._iid_
     _NoRegCoCreate(str(_DIA_DLL), ctypes.byref(clsid), ctypes.byref(iid), ctypes.byref(p))
     return client.GetBestInterface(p)
+
+
+class SymTag(enum.IntEnum):
+    Null = dia.SymTagNull
+    Exe = dia.SymTagExe
+    Compiland = dia.SymTagCompiland
+    CompilandDetails = dia.SymTagCompilandDetails
+    CompilandEnv = dia.SymTagCompilandEnv
+    Function = dia.SymTagFunction
+    Block = dia.SymTagBlock
+    Data = dia.SymTagData
+    Annotation = dia.SymTagAnnotation
+    Label = dia.SymTagLabel
+    PublicSymbol = dia.SymTagPublicSymbol
+    UDT = dia.SymTagUDT
+    # Enum = dia.SymTagEnum
+    Enum = 12
+    FunctionType = dia.SymTagFunctionType
+    PointerType = dia.SymTagPointerType
+    ArrayType = dia.SymTagArrayType
+    BaseType = dia.SymTagBaseType
+    Typedef = dia.SymTagTypedef
+    BaseClass = dia.SymTagBaseClass
+    Friend = dia.SymTagFriend
+    FunctionArgType = dia.SymTagFunctionArgType
+    FuncDebugStart = dia.SymTagFuncDebugStart
+    FuncDebugEnd = dia.SymTagFuncDebugEnd
+    UsingNamespace = dia.SymTagUsingNamespace
+    VTableShape = dia.SymTagVTableShape
+    VTable = dia.SymTagVTable
+    Custom = dia.SymTagCustom
+    Thunk = dia.SymTagThunk
+    CustomType = dia.SymTagCustomType
+    ManagedType = dia.SymTagManagedType
+    Dimension = dia.SymTagDimension
+    CallSite = dia.SymTagCallSite
+    InlineSite = dia.SymTagInlineSite
+    BaseInterface = dia.SymTagBaseInterface
+    VectorType = dia.SymTagVectorType
+    MatrixType = dia.SymTagMatrixType
+    HLSLType = dia.SymTagHLSLType
+    Caller = dia.SymTagCaller
+    Callee = dia.SymTagCallee
+    Export = dia.SymTagExport
+    HeapAllocationSite = dia.SymTagHeapAllocationSite
+    CoffGroup = dia.SymTagCoffGroup
+    Inlinee = dia.SymTagInlinee
+    Max = dia.SymTagMax
