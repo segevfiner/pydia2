@@ -44,7 +44,7 @@ setup(
     version=version,
     author="Segev Finer",
     author_email="segev208@gmail.com",
-    description="DIA packaged for use without registration using comtypes",
+    description="DIA packaged for use without COM registration using comtypes",
     long_description=long_description,
     long_description_content_type="text/x-rst",
     url="https://github.com/segevfiner/pydia2",
@@ -82,5 +82,10 @@ setup(
     python_requires=">=3.7",
     install_requires=[
         "comtypes",
-    ]
+    ],
+    extras_require={
+        "dev": {
+            "sphinx",
+        }
+    },
 )

@@ -1,3 +1,7 @@
+"""
+DIA packaged for use without registration using comtypes.
+"""
+
 import sys
 import pathlib
 import ctypes
@@ -19,7 +23,9 @@ else:
 _DIA_DLL = _SCRIPT_DIR / 'lib' / _arch / "msdia140.dll"
 
 
-#: The dia typelib module
+#: The dia typelib module. Retrieved via :func:`comtypes.client.GetModule`.
+#:
+#: :meta hide-value:
 dia = client.GetModule(str(_DIA_DLL))
 
 

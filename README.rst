@@ -1,6 +1,6 @@
 pydia2
 ======
-DIA packaged for use without registration using `comtypes <https://pypi.org/project/comtypes/>`_.
+DIA packaged for use without COM registration using `comtypes <https://pypi.org/project/comtypes/>`_.
 
 Installation
 ------------
@@ -10,6 +10,18 @@ with C++" workload of Visual Studio).
 .. code-block:: sh
 
     pip install pydia2
+
+Example
+-------
+.. code-block:: python
+
+    import pydia2
+
+    source = pydia2.CreateObject(pydia2.dia.DiaSource, interface=pydia2.dia.IDiaDataSource)
+    source.loadDataFromPdb("example.pdb")
+    session = source.openSession()
+
+    # Query the session...
 
 License
 -------
