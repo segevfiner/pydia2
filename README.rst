@@ -1,5 +1,13 @@
 pydia2
 ======
+.. image:: https://img.shields.io/pypi/v/pydia2.svg
+   :target: https://pypi.org/project/pydia2/
+   :alt: PyPI
+
+.. image:: https://github.com/segevfiner/pydia2/actions/workflows/docs.yml/badge.svg
+   :target: https://segevfiner.github.io/pydia2/
+   :alt: Docs
+
 DIA packaged for use without COM registration using `comtypes <https://pypi.org/project/comtypes/>`_.
 
 Installation
