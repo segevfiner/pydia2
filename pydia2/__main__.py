@@ -29,6 +29,7 @@ def load_data_from_pdb(file):
 def dump_all_pdb_info(session):
     dump_all_mods(session)
     dump_all_publics(session)
+    dump_all_symbols(session)
 
 
 def dump_all_mods(session):
@@ -80,12 +81,17 @@ def dump_all_publics(session):
     print()
 
 
+def dump_all_symbols(session):
+    pass
+
+
 def main():
     parser = argparse.ArgumentParser(prog="pydia2", description=__doc__)
     parser.add_argument("file")
     parser.add_argument("-a", "--all", action="store_true", help="print all the debug info")
     parser.add_argument("-m", "--mods", action="store_true", help="print all the mods")
     parser.add_argument("-p", "--publics", action="store_true", help="print all the publics")
+    parser.add_argument("-s", "--symbols", action="store_true", help="print symbols")
 
     args = parser.parse_args()
 
@@ -100,6 +106,9 @@ def main():
 
     if args.publics:
         dump_all_publics(session)
+
+    if args.symbols:
+        dump_all_symbols(session)
 
 
 if __name__ == "__main__":
