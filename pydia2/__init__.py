@@ -6,6 +6,9 @@ from comtypes import client
 from . import _dia
 
 
+__version__ = "0.1.0"
+
+
 _SCRIPT_DIR = pathlib.Path(__file__).resolve().parent
 
 if sys.maxsize > 2**32 - 1:
@@ -16,6 +19,7 @@ else:
 _DIA_DLL = _SCRIPT_DIR / 'lib' / _arch / "msdia140.dll"
 
 
+#: The dia typelib module
 dia = client.GetModule(str(_DIA_DLL))
 
 
@@ -30,6 +34,12 @@ _NoRegCoCreate = ctypes.WINFUNCTYPE(
 
 
 def CreateObject(progid, interface=None):
+    """
+    Create a DIA object from *progid* with the given *interface*.
+
+    Since this is intended to be used without registering DIA, you should grab the progid as a class
+    object from the :data:`dia` module variable.
+    """
     if interface is None:
         interface = comtypes.IUnknown
 
