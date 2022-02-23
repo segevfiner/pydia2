@@ -33,6 +33,15 @@ def dump_all_pdb_info(session):
     dump_all_mods(session)
     dump_all_publics(session)
     dump_all_symbols(session)
+    dump_all_globals(session)
+    dump_all_types(session)
+    dump_all_files(session)
+    dump_all_lines(session)
+    dump_all_sec_contribs(session)
+    dump_all_debug_streams(session)
+    dump_all_injected_sources(session)
+    dump_all_fpo(session)
+    dump_all_oems(session)
 
 
 def dump_all_mods(session):
@@ -204,7 +213,139 @@ def print_symbol(symbol, indent):
     elif sym_tag in (pydia2.dia.SymTagFunction, pydia2.dia.SymTagBlock):
         print_location(symbol)
 
-        # TODO
+        try:
+            print(f", len = {symbol.length:08X}", end='')
+        except comtypes.COMError:
+            pass
+
+        if sym_tag == pydia2.dia.SymTagFunction:
+            try:
+                # TODO enum
+                print(f", {symbol.callingConvention}", end='')
+            except comtypes.COMError:
+                pass
+
+        print_und_name(symbol)
+        print()
+
+        if sym_tag == pydia2.dia.SymTagFunction:
+            print(' ' * indent, end='')
+            print("                 Function attribute:", end='')
+
+            try:
+                if symbol.isCxxReturnUdt:
+                    print(" return user defined type (C++ style)", end='')
+            except comtypes.COMError:
+                pass
+
+            try:
+                if symbol.constructor:
+                    print(" instance constructor", end='')
+            except comtypes.COMError:
+                pass
+
+            try:
+                if symbol.isConstructorVirtualBase:
+                    print(" instance constructor of a class with virtual base", end='')
+            except comtypes.COMError:
+                pass
+
+            print()
+
+            print(' ' * indent, end='')
+            print("                 Function info:", end='')
+
+            try:
+                if symbol.hasAlloca:
+                    print(" alloca", end='')
+            except comtypes.COMError:
+                pass
+
+            try:
+                if symbol.hasSetJump:
+                    print(" setjmp", end='')
+            except comtypes.COMError:
+                pass
+
+            try:
+                if symbol.hasLongJump:
+                    print(" longjmp", end='')
+            except comtypes.COMError:
+                pass
+
+            try:
+                if symbol.hasInlAsm:
+                    print(" inlasm", end='')
+            except comtypes.COMError:
+                pass
+
+            try:
+                if symbol.hasEH:
+                    print(" eh", end='')
+            except comtypes.COMError:
+                pass
+
+            try:
+                if symbol.inlSpec:
+                    print(" inl_specified", end='')
+            except comtypes.COMError:
+                pass
+
+            try:
+                if symbol.hasSEH:
+                    print(" seh", end='')
+            except comtypes.COMError:
+                pass
+
+            try:
+                if symbol.isNaked:
+                    print(" naked", end='')
+            except comtypes.COMError:
+                pass
+
+            try:
+                if symbol.hasSecurityChecks:
+                    print(" gschecks", end='')
+            except comtypes.COMError:
+                pass
+
+            try:
+                if symbol.isSafeBuffers:
+                    print(" safebuffers", end='')
+            except comtypes.COMError:
+                pass
+
+            try:
+                if symbol.hasEHa:
+                    print(" asyncheh", end='')
+            except comtypes.COMError:
+                pass
+
+            try:
+                if symbol.noStackOrdering:
+                    print(" gsnostackordering", end='')
+            except comtypes.COMError:
+                pass
+
+            try:
+                if symbol.wasInlined:
+                    print(" wasinlined", end='')
+            except comtypes.COMError:
+                pass
+
+            try:
+                if symbol.strictGSCheck:
+                    print(" strict_gs_check", end='')
+            except comtypes.COMError:
+                pass
+
+            print()
+
+            enum_children = symbol.findChildren(pydia2.dia.SymTagNull, None, 0)
+            for child in enum_children:
+                child = child.QueryInterface(pydia2.dia.IDiaSymbol)
+                print_symbol(child, indent + 2)
+
     elif sym_tag == pydia2.dia.SymTagAnnotation:
         print_location(symbol)
         print()
@@ -249,6 +390,16 @@ def print_symbol(symbol, indent):
             print_type(type_)
         except comtypes.COMError:
             pass
+
+    if sym_tag in (pydia2.dia.SymTagUDT, pydia2.dia.SymTagAnnotation):
+        print()
+
+        enum_children = symbol.findChildren(pydia2.dia.SymTagNull, None, 0)
+        for child in enum_children:
+            child = child.QueryInterface(pydia2.dia.IDiaSymbol)
+            print_symbol(child, indent + 2)
+
+    print()
 
 
 def print_sym_tag(sym_tag):
