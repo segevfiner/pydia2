@@ -386,7 +386,7 @@ def print_symbol(symbol, indent):
 
         try:
             type_ = symbol.type
-            print(" has type ")
+            print(" has type ", end='')
             print_type(type_)
         except comtypes.COMError:
             pass
