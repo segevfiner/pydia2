@@ -47,7 +47,7 @@ def dump_all_pdb_info(session):
 def dump_all_mods(session):
     print("\n\n*** MODULES\n")
 
-    enum_symbols = session.globalScope.findChildren(pydia2.dia.SymTagCompiland, None, 0)
+    enum_symbols = session.globalScope.findChildren(pydia2.cvconst.SymTag.Compiland, None, 0)
     for i, symbol in enumerate(enum_symbols, 1):
         symbol = symbol.QueryInterface(pydia2.dia.IDiaSymbol)
         print(f"{i:04X} {symbol.name}")
@@ -58,7 +58,7 @@ def dump_all_mods(session):
 def dump_all_publics(session):
     print("\n\n*** PUBLICS\n")
 
-    enum_symbols = session.globalScope.findChildren(pydia2.dia.SymTagPublicSymbol, None, 0)
+    enum_symbols = session.globalScope.findChildren(pydia2.cvconst.SymTag.PublicSymbol, None, 0)
     for symbol in enum_symbols:
         symbol = symbol.QueryInterface(pydia2.dia.IDiaSymbol)
         print_public_symbol(symbol)
@@ -69,7 +69,7 @@ def dump_all_publics(session):
 def dump_all_symbols(session):
     print("\n\n*** SYMBOLS\n")
 
-    enum_symbols = session.globalScope.findChildren(pydia2.dia.SymTagCompiland, None, 0)
+    enum_symbols = session.globalScope.findChildren(pydia2.cvconst.SymTag.Compiland, None, 0)
     for compiland in enum_symbols:
         compiland = compiland.QueryInterface(pydia2.dia.IDiaSymbol)
         print("\n** Module: ", end='')
@@ -79,7 +79,7 @@ def dump_all_symbols(session):
         except comtypes.COMError:
             print("(???)\n")
 
-        enum_children = compiland.findChildren(pydia2.dia.SymTagNull, None, 0)
+        enum_children = compiland.findChildren(pydia2.cvconst.SymTag.Null, None, 0)
         for symbol in enum_children:
             symbol = symbol.QueryInterface(pydia2.dia.IDiaSymbol)
             print_symbol(symbol, 0)
@@ -153,9 +153,9 @@ def print_public_symbol(symbol):
     except comtypes.COMError:
         rva = 0xFFFFFFFF
 
-    print(f"{pydia2.SymTag(symbol.symTag).name}: [{rva:08X}][{symbol.addressSection:04X}:{symbol.addressOffset:08X}] ", end='')
+    print(f"{pydia2.cvconst.SymTag(symbol.symTag).name}: [{rva:08X}][{symbol.addressSection:04X}:{symbol.addressOffset:08X}] ", end='')
 
-    if symbol.symTag == pydia2.dia.SymTagThunk:
+    if symbol.symTag == pydia2.cvconst.SymTag.Thunk:
         try:
             print("f{symbol.name}")
         except comtypes.COMError:
@@ -194,23 +194,23 @@ def print_symbol(symbol, indent):
     except comtypes.COMError:
         print("ERROR - PrintSymbol get_symTag() failed")
 
-    if sym_tag == pydia2.dia.SymTagFunction:
+    if sym_tag == pydia2.cvconst.SymTag.Function:
         print()
 
     print_sym_tag(sym_tag)
 
     print(' ' * indent, end='')
 
-    if sym_tag == pydia2.dia.SymTagCompilandDetails:
+    if sym_tag == pydia2.cvconst.SymTag.CompilandDetails:
         print_compiland_details(symbol)
 
-    elif sym_tag == pydia2.dia.SymTagCompilandEnv:
+    elif sym_tag == pydia2.cvconst.SymTag.CompilandEnv:
         print_compiland_env(symbol)
 
-    elif sym_tag == pydia2.dia.SymTagData:
+    elif sym_tag == pydia2.cvconst.SymTag.Data:
         print_data(symbol)
 
-    elif sym_tag in (pydia2.dia.SymTagFunction, pydia2.dia.SymTagBlock):
+    elif sym_tag in (pydia2.cvconst.SymTag.Function, pydia2.cvconst.SymTag.Block):
         print_location(symbol)
 
         try:
@@ -218,7 +218,7 @@ def print_symbol(symbol, indent):
         except comtypes.COMError:
             pass
 
-        if sym_tag == pydia2.dia.SymTagFunction:
+        if sym_tag == pydia2.cvconst.SymTag.Function:
             try:
                 # TODO enum
                 print(f", {symbol.callingConvention}", end='')
@@ -228,7 +228,7 @@ def print_symbol(symbol, indent):
         print_und_name(symbol)
         print()
 
-        if sym_tag == pydia2.dia.SymTagFunction:
+        if sym_tag == pydia2.cvconst.SymTag.Function:
             print(' ' * indent, end='')
             print("                 Function attribute:", end='')
 
@@ -341,27 +341,27 @@ def print_symbol(symbol, indent):
 
             print()
 
-            enum_children = symbol.findChildren(pydia2.dia.SymTagNull, None, 0)
+            enum_children = symbol.findChildren(pydia2.cvconst.SymTag.Null, None, 0)
             for child in enum_children:
                 child = child.QueryInterface(pydia2.dia.IDiaSymbol)
                 print_symbol(child, indent + 2)
 
-    elif sym_tag == pydia2.dia.SymTagAnnotation:
+    elif sym_tag == pydia2.cvconst.SymTag.Annotation:
         print_location(symbol)
         print()
 
-    elif sym_tag == pydia2.dia.SymTagLabel:
+    elif sym_tag == pydia2.cvconst.SymTag.Label:
         print_location(symbol)
         print(", ", end='')
         print_name(symbol)
 
-    elif sym_tag in (pydia2.dia.SymTagEnum, pydia2.dia.SymTagTypedef, pydia2.dia.SymTagUDT, pydia2.dia.SymTagBaseClass):
+    elif sym_tag in (pydia2.cvconst.SymTag.Enum, pydia2.cvconst.SymTag.Typedef, pydia2.cvconst.SymTag.UDT, pydia2.cvconst.SymTag.BaseClass):
         print_udt(symbol)
 
-    elif sym_tag in (pydia2.dia.SymTagFuncDebugStart, pydia2.dia.SymTagFuncDebugEnd):
+    elif sym_tag in (pydia2.cvconst.SymTag.FuncDebugStart, pydia2.cvconst.SymTag.FuncDebugEnd):
         print_location(symbol)
 
-    elif sym_tag in (pydia2.dia.SymTagFunctionArgType, pydia2.dia.SymTagFunctionType, pydia2.dia.SymTagPointerType, pydia2.dia.SymTagArrayType, pydia2.dia.SymTagBaseType):
+    elif sym_tag in (pydia2.cvconst.SymTag.FunctionArgType, pydia2.cvconst.SymTag.FunctionType, pydia2.cvconst.SymTag.PointerType, pydia2.cvconst.SymTag.ArrayType, pydia2.cvconst.SymTag.BaseType):
         try:
             print_type(symbol.type)
         except comtypes.COMError:
@@ -369,16 +369,16 @@ def print_symbol(symbol, indent):
 
         print()
 
-    elif sym_tag == pydia2.dia.SymTagThunk:
+    elif sym_tag == pydia2.cvconst.SymTag.Thunk:
         print_thunk(symbol)
 
-    elif sym_tag == pydia2.dia.SymTagCallSite:
+    elif sym_tag == pydia2.cvconst.SymTag.CallSite:
         print_call_site_info(symbol)
 
-    elif sym_tag == pydia2.dia.SymTagHeapAllocationSite:
+    elif sym_tag == pydia2.cvconst.SymTag.HeapAllocationSite:
         print_heap_alloc_site(symbol)
 
-    elif sym_tag == pydia2.dia.SymTagCoffGroup:
+    elif sym_tag == pydia2.cvconst.SymTag.CoffGroup:
         print_coff_group(symbol)
 
     else:
@@ -391,10 +391,10 @@ def print_symbol(symbol, indent):
         except comtypes.COMError:
             pass
 
-    if sym_tag in (pydia2.dia.SymTagUDT, pydia2.dia.SymTagAnnotation):
+    if sym_tag in (pydia2.cvconst.SymTag.UDT, pydia2.cvconst.SymTag.Annotation):
         print()
 
-        enum_children = symbol.findChildren(pydia2.dia.SymTagNull, None, 0)
+        enum_children = symbol.findChildren(pydia2.cvconst.SymTag.Null, None, 0)
         for child in enum_children:
             child = child.QueryInterface(pydia2.dia.IDiaSymbol)
             print_symbol(child, indent + 2)
@@ -403,7 +403,7 @@ def print_symbol(symbol, indent):
 
 
 def print_sym_tag(sym_tag):
-    print(f"{pydia2.SymTag(sym_tag).name:15s}: ", end='')
+    print(f"{pydia2.cvconst.SymTag(sym_tag).name:15s}: ", end='')
 
 
 def print_name(symbol):
@@ -427,7 +427,18 @@ def print_compiland_env(symbol):
 
 
 def print_location(symbol):
-    pass  # TODO
+    try:
+        location_type = symbol.locationType
+    except comtypes.COMError:
+        print("symbol in optimized code", end='')
+        return
+
+    if location_type == pydia2.cvconst.LocationType.Static:
+        try:
+            print(f"{pydia2.cvconst.LocationType(location_type).name}, [{symbol.relativeVirtualAddress:08X}][{symbol.addressSection:04X}:{symbol.addressOffset:08X}]", end='')
+        except comtypes.COMError:
+            pass
+    # TODO
 
 
 def print_const(symbol):
@@ -529,7 +540,6 @@ def main():
     parser.add_argument("--mapfromsrc", metavar="RVA", help="dump image RVA for src RVA")
 
     args = parser.parse_args()
-    print(args)
 
     source, session = load_data_from_pdb(args.file)
 
