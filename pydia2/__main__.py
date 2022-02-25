@@ -220,8 +220,7 @@ def print_symbol(symbol, indent):
 
         if sym_tag == pydia2.cvconst.SymTag.Function:
             try:
-                # TODO enum
-                print(f", {symbol.callingConvention}", end='')
+                print(f", {pydia2.cvconst.Call(symbol.callingConvention).name}", end='')
             except comtypes.COMError:
                 pass
 
