@@ -89,6 +89,7 @@ setup(
     ],
     extras_require={
         "dev": {
+            "pycparser"
             "sphinx",
         }
     },

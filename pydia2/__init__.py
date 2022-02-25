@@ -7,7 +7,7 @@ import pathlib
 import ctypes
 import comtypes
 from comtypes import client
-from . import _dia
+from . import _dia, cvconst
 
 
 __version__ = "0.1.0"
