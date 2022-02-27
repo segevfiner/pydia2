@@ -3,6 +3,7 @@ Dump debug information for executable or from a pdb.
 
 This is a reproduction of the DIA2Dump sample included with the DIA SDK.
 """
+# TODO Audit exception handling
 import sys
 import os
 import argparse
