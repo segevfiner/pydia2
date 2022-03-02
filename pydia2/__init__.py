@@ -5,6 +5,7 @@ DIA packaged for use without COM registration using comtypes.
 import sys
 import pathlib
 import ctypes
+import enum
 import comtypes
 from comtypes import client
 from . import _dia, cvconst
