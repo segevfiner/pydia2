@@ -444,7 +444,16 @@ def print_und_name(symbol):
 
 
 def print_thunk(symbol):
-    print("TODO", end='')  # TODO
+    try:
+        print(f"[{symbol.relativeVirtualAddress:08X}][{symbol.addressSection:04X}:{symbol.addressOffset:08X}]", end='')
+    except comtypes.COMError:
+        pass
+
+    try:
+        print(f", target [{symbol.targetSection:08X}][{symbol.targetOffset:04X}:{symbol.targetRelativeVirtualAddress:08X}]", end='')
+    except comtypes.COMError:
+        print(", target ", end='')
+        print_name(symbol)
 
 
 def print_compiland_details(symbol):
