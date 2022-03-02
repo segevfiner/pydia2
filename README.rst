@@ -37,3 +37,6 @@ MIT license.
 
 DIA (Debug Information Access) is distributed according to the Microsoft Visual Studio™ distributable
 code license terms: https://visualstudio.microsoft.com/license-terms/mlt031819/
+
+symsrv.dll is distributed according to the Windows SDK "Distributable Code" license terms:
+https://docs.microsoft.com/en-us/legal/windows-sdk/redist.

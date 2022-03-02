@@ -3,6 +3,7 @@ import os
 import re
 import subprocess
 import shutil
+import winreg
 from setuptools import setup, find_packages, Extension
 
 
@@ -25,6 +26,10 @@ result.check_returncode()
 dia_sdk = result.stdout.strip()
 
 
+with winreg.OpenKeyEx(winreg.HKEY_LOCAL_MACHINE, R"SOFTWARE\Wow6432Node\Microsoft\Microsoft SDKs\Windows\v10.0") as key:
+    winsdk = winreg.QueryValueEx(key, "InstallationFolder")[0]
+
+
 if sys.maxsize > 2**32 - 1:
     arch_dir = "amd64"
 else:
@@ -37,6 +42,14 @@ if not os.path.exists("pydia2/lib/x86/msdia140.dll"):
 
 if not os.path.exists("pydia2/lib/amd64/msdia140.dll"):
     shutil.copy(os.path.join(dia_sdk, "bin/amd64/msdia140.dll"), "pydia2/lib/amd64/msdia140.dll")
+
+
+if not os.path.exists("pydia2/lib/x86/symsrv.dll"):
+    shutil.copy(os.path.join(winsdk, R"Debuggers\x86\symsrv.dll"), "pydia2/lib/x86/symsrv.dll")
+
+
+if not os.path.exists("pydia2/lib/amd64/symsrv.dll"):
+    shutil.copy(os.path.join(winsdk, R"Debuggers\x64\symsrv.dll"), "pydia2/lib/amd64/symsrv.dll")
 
 
 setup(
@@ -80,7 +93,12 @@ setup(
         ),
     ],
     package_data={
-        "pydia2": ["lib/x86/msdia140.dll", "lib/amd64/msdia140.dll"],
+        "pydia2": [
+            "lib/x86/msdia140.dll",
+            "lib/amd64/msdia140.dll",
+            "lib/x86/symsrv.dll",
+            "lib/amd64/symsrv.dll",
+        ],
     },
     zip_safe=False,
     python_requires=">=3.7",
