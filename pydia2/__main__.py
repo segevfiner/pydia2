@@ -968,7 +968,93 @@ def print_udt_kind(symbol):
 
 
 def print_type_in_detail(symbol, indent):
-    print("TODO", end='')  # TODO
+    try:
+        sym_tag = symbol.symTag
+    except comtypes.COMError:
+        print("ERROR - PrintTypeInDetail() get_symTag")
+        return
+
+    print_sym_tag(sym_tag)
+
+    print(' ' * indent, end='')
+
+    if sym_tag == cvconst.SymTag.Data:
+        print_data(symbol)
+
+        try:
+            type_ = symbol.type
+            sym_tag_type = type_.symTag
+            if sym_tag_type == cvconst.SymTag.UDT:
+                print()
+                print_type_in_detail(type_, indent + 2)
+        except comtypes.COMError:
+            pass
+
+    elif sym_tag in (cvconst.SymTag.Typedef, cvconst.SymTag.VTable):
+        print_symbol_type(symbol)
+
+    elif sym_tag in (cvconst.SymTag.Enum, cvconst.SymTag.UDT):
+        print_udt(symbol)
+        print()
+
+        enum_children = symbol.findChildren(cvconst.SymTag.Null, None, 0)
+        for child in enum_children:
+            child = child.QueryInterface(dia.IDiaSymbol)
+            print_type_in_detail(child, indent + 2)
+
+        return
+
+    elif sym_tag == cvconst.SymTag.Function:
+        print_function_type(symbol)
+        return
+
+    elif sym_tag == cvconst.SymTag.PointerType:
+        print_name(symbol)
+        print(" has type ", end='')
+        print_type(symbol)
+
+    elif sym_tag in (cvconst.SymTag.ArrayType, cvconst.SymTag.BaseType, cvconst.SymTag.FunctionArgType, cvconst.SymTag.UsingNamespace, cvconst.SymTag.Custom, cvconst.SymTag.Friend):
+        print_name(symbol)
+        print_symbol_type(symbol)
+
+    elif sym_tag in (cvconst.SymTag.VTableShape, cvconst.SymTag.BaseClass):
+        print_name(symbol)
+
+        try:
+            print(f" virtual, offset = 0x{symbol.virtualBaseDispIndex:X}, pointer offset = {symbol.virtualBasePointerOffset}, virtual base pointer type = ", end='')
+
+            try:
+                virtualBaseTableType = symbol.virtualBaseTableType
+                if virtualBaseTableType:
+                    print_type(virtualBaseTableType)
+            except comtypes.COMError:
+                print("(unknown)", end='')
+        except comtypes.COMError:
+            try:
+                print(f", offset = 0x{symbol.offset:X}", end='')
+            except comtypes.COMError:
+                pass
+
+        print()
+
+        enum_children = symbol.findChildren(cvconst.SymTag.Null, None, 0)
+        for child in enum_children:
+            child = child.QueryInterface(dia.IDiaSymbol)
+            print_type_in_detail(child, indent + 2)
+
+    elif sym_tag == cvconst.SymTag.FunctionType:
+        try:
+            print_type(symbol.type)
+        except comtypes.COMError:
+            pass
+
+    elif sym_tag == cvconst.SymTag.Thunk:
+        print_thunk(symbol)
+
+    else:
+        print("ERROR - PrintTypeInDetail() invalid SymTag")
+
+    print()
 
 
 def print_function_type(symbol):
