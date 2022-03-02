@@ -90,23 +90,54 @@ def dump_all_symbols(session):
 
 
 def dump_all_globals(session):
-    pass  # TODO
+    print("\n\n*** GLOBALS\n")
+
+    for sym_tag in [cvconst.SymTag.Function, cvconst.SymTag.Thunk, cvconst.SymTag.Data]:
+        enum_children = session.globalScope.findChildren(sym_tag, None, 0)
+        for symbol in enum_children:
+            symbol = symbol.QueryInterface(dia.IDiaSymbol)
+            print_global_symbol(symbol)
 
 
 def dump_all_types(session):
-    pass  # TODO
+    print("\n\n*** TYPES\n")
+
+    dump_all_udts(session)
+    dump_all_enums(session)
+    dump_all_typedefs(session)
 
 
 def dump_all_udts(session):
-    pass  # TODO
+    print("\n\n** User Defined Types\n")
+
+    enum_children = session.globalScope.findChildren(cvconst.SymTag.UDT, None, 0)
+    for symbol in enum_children:
+        symbol = symbol.QueryInterface(dia.IDiaSymbol)
+        print_type_in_detail(symbol, 0)
+
+    print()
 
 
 def dump_all_enums(session):
-    pass  # TODO
+    print("\n\n** ENUMS\n")
+
+    enum_children = session.globalScope.findChildren(cvconst.SymTag.Enum, None, 0)
+    for symbol in enum_children:
+        symbol = symbol.QueryInterface(dia.IDiaSymbol)
+        print_type_in_detail(symbol, 0)
+
+    print()
 
 
 def dump_all_typedefs(session):
-    pass  # TODO
+    print("\n\n** TYPEDEFS\n")
+
+    enum_children = session.globalScope.findChildren(cvconst.SymTag.Typedef, None, 0)
+    for symbol in enum_children:
+        symbol = symbol.QueryInterface(dia.IDiaSymbol)
+        print_type_in_detail(symbol, 0)
+
+    print()
 
 
 def dump_all_files(session):
@@ -146,7 +177,14 @@ def dump_all_fpo(session):
 
 
 def dump_all_oems(session):
-    pass  # TODO
+    print("\n\n*** OEM Specific types\n")
+
+    enum_children = session.globalScope.findChildren(cvconst.SymTag.CustomType, None, 0)
+    for symbol in enum_children:
+        symbol = symbol.QueryInterface(dia.IDiaSymbol)
+        print_type_in_detail(symbol, 0)
+
+    print()
 
 
 def print_public_symbol(symbol):
@@ -179,15 +217,70 @@ def print_global_symbol(symbol):
 
 
 def print_call_site_info(symbol):
-    print("TODO", end='')  # TODO
+    try:
+        print(f"[0x{symbol.addressSection:04X}:0x{symbol.addressOffset:08X}]  ", end='')
+    except comtypes.COMError:
+        pass
+
+    try:
+        print(f"0x{symbol.relativeVirtualAddress:08X}  ", end='')
+    except comtypes.COMError:
+        pass
+
+    try:
+        func_type = symbol.type
+        tag = symbol.symTag
+
+        if tag == cvconst.SymTag.FunctionType:
+            print_function_type(tag)
+        elif tag == cvconst.SymTag.PointerType:
+            print_function_type(func_type)
+        else:
+            print("???")
+    except comtypes.COMError:
+        pass
 
 
 def print_heap_alloc_site(symbol):
-    print("TODO", end='')  # TODO
+    try:
+        print(f"[0x{symbol.addressSection:04X}:0x{symbol.addressOffset:08X}]  ", end='')
+    except comtypes.COMError:
+        pass
+
+    try:
+        print(f"0x{symbol.relativeVirtualAddress:08X}  ", end='')
+    except comtypes.COMError:
+        pass
+
+    try:
+        alloc_type = symbol.type
+        print_type(alloc_type)
+    except comtypes.COMError:
+        pass
 
 
 def print_coff_group(symbol):
-    print("TODO", end='')  # TODO
+    try:
+        print(f"[0x{symbol.addressSection:04X}:0x{symbol.addressOffset:08X}]  ", end='')
+    except comtypes.COMError:
+        pass
+
+    try:
+        print(f"0x{symbol.relativeVirtualAddress:08X}, ", end='')
+    except comtypes.COMError:
+        pass
+
+    try:
+        print("len = {symbol.length:08X}, ", end='')
+    except comtypes.COMError:
+        pass
+
+    try:
+        print("characteristics = {symbol.characteristics:08X}", end='')
+    except comtypes.COMError:
+        pass
+
+    print_name(symbol)
 
 
 def print_symbol(symbol, indent):
@@ -1030,7 +1123,6 @@ def main():
 
     if args.mapfromsrc:
         pass  # TODO
-
 
 
 if __name__ == "__main__":
