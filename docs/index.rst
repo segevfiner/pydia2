@@ -4,7 +4,8 @@ Welcome to pydia2's documentation!
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-   :hidden:
+
+   changelog
 
 .. automodule:: pydia2
    :members:
