@@ -141,7 +141,14 @@ def dump_all_typedefs(session):
 
 
 def dump_all_files(session):
-    pass  # TODO
+    print("\n\n*** FILES\n")
+
+    enum_children = session.globalScope.findChildren(cvconst.SymTag.Compiland, None, 0)
+    for symbol in enum_children:
+        symbol = symbol.QueryInterface(dia.IDiaSymbol)
+        print_type_in_detail(symbol, 0)
+
+    print()
 
 
 def dump_all_lines(session):
@@ -794,155 +801,155 @@ def print_type(symbol):
         except comtypes.COMError:
             pass
 
-        if sym_tag == cvconst.SymTag.UDT:
-            print_udt_kind(symbol)
-            print_name(symbol)
+    if sym_tag == cvconst.SymTag.UDT:
+        print_udt_kind(symbol)
+        print_name(symbol)
 
-        elif sym_tag == cvconst.SymTag.Enum:
-            print("enum ", end='')
-            print_name(symbol)
+    elif sym_tag == cvconst.SymTag.Enum:
+        print("enum ", end='')
+        print_name(symbol)
 
-        elif sym_tag == cvconst.SymTag.FunctionType:
-            print("function ", end='')
+    elif sym_tag == cvconst.SymTag.FunctionType:
+        print("function ", end='')
 
-        elif sym_tag == cvconst.SymTag.PointerType:
-            try:
-                base_type = symbol.type
-            except comtypes.COMError:
-                print("ERROR - SymTagPointerType get_type", end='')
-                return
+    elif sym_tag == cvconst.SymTag.PointerType:
+        try:
+            base_type = symbol.type
+        except comtypes.COMError:
+            print("ERROR - SymTagPointerType get_type", end='')
+            return
 
-            print_type(base_type)
+        print_type(base_type)
 
-            try:
-                if symbol.reference:
-                    print(" &")
-                else:
-                    print(" *")
-            except comtypes.COMError:
-                pass
+        try:
+            if symbol.reference:
+                print(" &")
+            else:
+                print(" *")
+        except comtypes.COMError:
+            pass
 
-            try:
-                if symbol.constType:
-                    print("const ", end='')
-            except comtypes.COMError:
-                pass
+        try:
+            if symbol.constType:
+                print("const ", end='')
+        except comtypes.COMError:
+            pass
 
-            try:
-                if symbol.volatileType:
-                    print("volatile ", end='')
-            except comtypes.COMError:
-                pass
+        try:
+            if symbol.volatileType:
+                print("volatile ", end='')
+        except comtypes.COMError:
+            pass
 
-            try:
-                if symbol.unalignedType:
-                    print("__unaligned ", end='')
-            except comtypes.COMError:
-                pass
+        try:
+            if symbol.unalignedType:
+                print("__unaligned ", end='')
+        except comtypes.COMError:
+            pass
 
 
-        elif sym_tag == cvconst.SymTag.ArrayType:
-            try:
-                base_type = symbol.type
-            except comtypes.Error:
-                print("ERROR - SymTagArrayType get_type")
-                return
+    elif sym_tag == cvconst.SymTag.ArrayType:
+        try:
+            base_type = symbol.type
+        except comtypes.Error:
+            print("ERROR - SymTagArrayType get_type")
+            return
 
-            print_type(base_type)
+        print_type(base_type)
 
-            try:
-                rank = symbol.rank
-                enum_sym = symbol.findChildren(cvconst.SymTag.Dimension, None, 0)
+        try:
+            rank = symbol.rank
+            enum_sym = symbol.findChildren(cvconst.SymTag.Dimension, None, 0)
+            for sym in enum_sym:
+                sym = sym.QueryInterface(dia.IDiaSymbol)
+
+                print("[", end='')
+
+                try:
+                    print_bound(symbol.lowerBound)
+                    print("..", end='')
+                except comtypes.COMError:
+                    pass
+
+                try:
+                    print_bound(symbol.upperBound)
+                    print("..", end='')
+                except comtypes.COMError:
+                    pass
+
+                print("]", end='')
+        except comtypes.Error:
+            enum_sym = symbol.findChildren(cvconst.SymTag.CustomType, None, 0)
+            if enum_sym is not None and enum_sym.Count > 0:
                 for sym in enum_sym:
                     sym = sym.QueryInterface(dia.IDiaSymbol)
-
                     print("[", end='')
-
-                    try:
-                        print_bound(symbol.lowerBound)
-                        print("..", end='')
-                    except comtypes.COMError:
-                        pass
-
-                    try:
-                        print_bound(symbol.upperBound)
-                        print("..", end='')
-                    except comtypes.COMError:
-                        pass
-
+                    print_type(sym)
                     print("]", end='')
-            except comtypes.Error:
-                enum_sym = symbol.findChildren(cvconst.SymTag.CustomType, None, 0)
-                if enum_sym is not None and enum_sym.Count > 0:
-                    for sym in enum_sym:
-                        sym = sym.QueryInterface(dia.IDiaSymbol)
-                        print("[", end='')
-                        print_type(sym)
-                        print("]", end='')
-                else:
+            else:
+                try:
+                    print(f"[0x{symbol.count:X}", end='')
+                except comtypes.Error:
                     try:
-                        print(f"[0x{symbol.count:X}", end='')
+                        len_array = symbol.length
+                        len_elem = base_type.length
+
+                        if len_elem == 0:
+                            print(f"[0x{len_array:X}]", end='')
+                        else:
+                            print(f"[0x{len_array / len_elem}]", end='')
+
                     except comtypes.Error:
-                        try:
-                            len_array = symbol.length
-                            len_elem = base_type.length
-
-                            if len_elem == 0:
-                                print(f"[0x{len_array:X}]", end='')
-                            else:
-                                print(f"[0x{len_array / len_elem}]", end='')
-
-                        except comtypes.Error:
-                            pass
+                        pass
 
 
-        elif sym_tag == cvconst.SymTag.BaseType:
-            try:
-                info = symbol.baseType
-            except comtypes.COMError:
-                print("SymTagBaseType get_baseType", end='')
-                return
+    elif sym_tag == cvconst.SymTag.BaseType:
+        try:
+            info = symbol.baseType
+        except comtypes.COMError:
+            print("SymTagBaseType get_baseType", end='')
+            return
 
-            if info == cvconst.BasicType.UInt:
-                print("unsigned ", end='')
+        if info == cvconst.BasicType.UInt:
+            print("unsigned ", end='')
 
-            if info == cvconst.BasicType.Int:
-                if len_ == 1:
-                    if info == cvconst.BasicType.Int:
-                        print("signed ", end='')
+        if info == cvconst.BasicType.Int:
+            if len_ == 1:
+                if info == cvconst.BasicType.Int:
+                    print("signed ", end='')
 
-                elif len_ == 2:
-                    print("short", end='')
+            elif len_ == 2:
+                print("short", end='')
 
-                elif len_ == 4:
-                    print("int", end='')
+            elif len_ == 4:
+                print("int", end='')
 
-                elif len_ == 8:
-                    print("__int64", end='')
+            elif len_ == 8:
+                print("__int64", end='')
 
-                info = 0xFFFFFFFF
+            info = 0xFFFFFFFF
 
-            elif info == cvconst.BasicType.Float:
-                if len_ == 4:
-                    print("float", end='')
-                elif len_ == 8:
-                    print("double", end='')
+        elif info == cvconst.BasicType.Float:
+            if len_ == 4:
+                print("float", end='')
+            elif len_ == 8:
+                print("double", end='')
 
-                info = 0xFFFFFFFF
+            info = 0xFFFFFFFF
 
-            if info != 0xFFFFFFFF:
-                # TODO Better strings?
-                print(f"{cvconst.BasicType(info).name}", end='')
+        if info != 0xFFFFFFFF:
+            # TODO Better strings?
+            print(f"{cvconst.BasicType(info).name}", end='')
 
 
-        elif sym_tag == cvconst.SymTag.Typedef:
-            print_name(symbol)
+    elif sym_tag == cvconst.SymTag.Typedef:
+        print_name(symbol)
 
-        elif sym_tag == cvconst.SymTag.CustomType:
-            pass  # TODO
+    elif sym_tag == cvconst.SymTag.CustomType:
+        pass  # TODO
 
-        elif sym_tag == cvconst.SymTag.Data:
-            print_location(symbol)
+    elif sym_tag == cvconst.SymTag.Data:
+        print_location(symbol)
 
 
 def print_bound(symbol):
@@ -1058,7 +1065,7 @@ def print_type_in_detail(symbol, indent):
 
 
 def print_function_type(symbol):
-    print("TODO", end='')  # TODO
+    print("TODO")  # TODO
 
 
 def print_source_file(source):
