@@ -13,7 +13,7 @@ DIA packaged for use without COM registration using `comtypes <https://pypi.org/
 Installation
 ------------
 Wheels are available. Building from source requires the DIA SDK (Install the "Desktop development
-with C++" workload of Visual Studio).
+with C++" workload of Visual Studio) and the "Debugging Tools for Windows" from the Windows SDK.
 
 .. code-block:: sh
 
