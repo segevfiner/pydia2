@@ -10,7 +10,7 @@ from comtypes import client
 from . import _dia, cvconst
 
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 
 _SCRIPT_DIR = pathlib.Path(__file__).resolve().parent

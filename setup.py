@@ -79,6 +79,8 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
     ],
     keywords=["dia", "comtypes"],
     packages=find_packages(),
@@ -107,6 +109,7 @@ setup(
     ],
     extras_require={
         "dev": {
+            "setuptools",
             "pycparser",
             "sphinx",
         }

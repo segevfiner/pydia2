@@ -17,12 +17,12 @@ jobs:
         os: [windows-2019]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
 
       # Used to host cibuildwheel
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v5
 
       - name: Build sdist
         if: matrix.os == 'windows-2019'
@@ -30,13 +30,13 @@ jobs:
           python setup.py sdist
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.3.1
+        uses: pypa/cibuildwheel@v2.16.5
         with:
           output-dir: dist
         env:
-          CIBW_BUILD: "cp310-win32 cp310-win_amd64"
+          CIBW_BUILD: "cp311-win32 cp311-win_amd64"
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           path: dist/*
 
@@ -47,7 +47,7 @@ jobs:
     if: github.event_name == 'release' && github.event.action == 'published'
 
     steps:
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v4
       with:
         name: artifact
         path: dist

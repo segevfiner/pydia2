@@ -3,6 +3,12 @@
 Changelog
 =========
 
+v0.2.1 (2024-02-22)
+-------------------
+Changed
+^^^^^^^
+* Refreshed project metadata and cleanups.
+
 v0.2.0 (2022-03-02)
 -------------------
 
